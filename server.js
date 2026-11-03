@@ -1,6 +1,6 @@
 // Máy chủ nội bộ cho game "Đi chùa khi bị Sếp chửi". Chỉ cần Node.js, không cài thêm gì.
-// Vị trí người chơi chỉ nằm trong bộ nhớ. Thứ duy nhất ghi xuống đĩa là bảng hạng:
-// Pháp danh và điểm cao nhất, trong file bang-hang.json. Lời cầu không bao giờ gửi lên đây.
+// Vị trí người chơi chỉ nằm trong bộ nhớ. Ghi xuống đĩa có bảng hạng (bang-hang.json) và
+// lời nhắn hoa đăng công khai (hoa-dang.json). Lời cầu trên dải lụa không bao giờ gửi lên đây.
 // Tin nhắn trò chuyện chỉ nằm trong bộ nhớ, tắt máy chủ là mất.
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os'), crypto = require('crypto');
 
@@ -10,6 +10,7 @@ const GIU_TEN_MS = 20000;     // Mất kết nối bao lâu thì nhả Pháp dan
 const GIAN_CACH_THI_MS = 20000; // Một lượt thi thật mất hơn 20 giây
 const TRANG = path.join(__dirname, 'index.html');
 const FILE_BANG = path.join(process.env.DATA_DIR || __dirname, 'bang-hang.json');
+const FILE_DEN = path.join(process.env.DATA_DIR || __dirname, 'hoa-dang.json');
 const MA_VAO = (process.env.MA_VAO || '').trim(); // Đặt khi chạy trên internet để chỉ người có mã mới vào được
 
 const nguoi = new Map();      // id -> { id, n, g, x, z, r, p, res, roi, thi }
@@ -50,6 +51,8 @@ function vao(res, b) {
   // Máy chủ miễn phí có thể mất file khi khởi động lại: điểm cao nhất lưu trên máy người chơi sẽ tự ghi lại khi họ vào
   const hangCu = Math.round(so(b.hang, 0, 1000, 0)), kTen = chuanTen(ten);
   if (hangCu > (bang[kTen]?.d ?? 0)) { bang[kTen] = { n: ten, d: hangCu }; ghiBang(); }
+  // Tương tự, đèn hoa đăng công khai của người chơi được thả lại khi họ vào
+  if (Array.isArray(b.den)) for (const d of b.den.slice(0, 5)) themDen(ten, d?.t, so(d?.ts, 0, 9e15, Date.now()));
   json(res, 200, { id });
 }
 function viTri(res, b) {
@@ -67,6 +70,7 @@ function suKien(req, res, id) {
   q.res = res; q.roi = 0; doi = true;
   res.write(`data: ${banTin()}\n\n`);
   res.write(`data: ${JSON.stringify({ chatCu: tinNhan })}\n\n`);
+  res.write(`data: ${JSON.stringify({ hoaDangCu: hoaDang })}\n\n`);
   req.on('close', () => { if (q.res === res) { q.res = null; q.roi = Date.now(); doi = true; } });
 }
 const dangOnline = () => [...nguoi.values()].filter(q => q.res);
@@ -111,6 +115,29 @@ function nopChat(res, b) {
   json(res, 200, {});
 }
 
+/* ----- Hoa đăng công khai: lời nhắn kèm Pháp danh, giữ 40 đèn gần nhất ----- */
+let hoaDang = [];
+try { hoaDang = JSON.parse(fs.readFileSync(FILE_DEN, 'utf8')); } catch { hoaDang = []; }
+let henGhiDen = null;
+function themDen(n, t, ts) {
+  t = String(t || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().replace(/\s+/g, ' ').slice(0, 120);
+  if (!t || hoaDang.some(m => m.n === n && m.t === t)) return null;
+  const m = { n, t, ts };
+  hoaDang.push(m); if (hoaDang.length > 40) hoaDang.shift();
+  clearTimeout(henGhiDen); henGhiDen = setTimeout(() => fs.writeFile(FILE_DEN, JSON.stringify(hoaDang), () => {}), 500);
+  return m;
+}
+function nopDen(res, b) {
+  const q = nguoi.get(b.id);
+  if (!q) return json(res, 410, { loi: 'Phiên đã hết' });
+  const bayGio = Date.now();
+  if (bayGio - (q.den || 0) < 3000) return json(res, 429, { loi: 'Bạn thả chậm lại một chút nhé.' });
+  q.den = bayGio;
+  const m = themDen(q.n, b.t, bayGio);
+  if (m) { const goi = `data: ${JSON.stringify({ hoaDangMoi: m })}\n\n`; for (const p of dangOnline()) p.res.write(goi); }
+  json(res, 200, {});
+}
+
 // Phát trạng thái 5 lần mỗi giây khi có thay đổi, giữ kết nối sống mỗi 15 giây
 setInterval(() => { if (!doi) return; doi = false; const m = `data: ${banTin()}\n\n`; for (const q of dangOnline()) q.res.write(m); }, 200);
 setInterval(() => { for (const q of dangOnline()) q.res.write(': giu\n\n'); }, 15000);
@@ -123,6 +150,7 @@ http.createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/vi-tri') return viTri(res, await docBody(req));
     if (req.method === 'POST' && url.pathname === '/api/diem') return nopDiem(res, await docBody(req));
     if (req.method === 'POST' && url.pathname === '/api/chat') return nopChat(res, await docBody(req));
+    if (req.method === 'POST' && url.pathname === '/api/hoa-dang') return nopDen(res, await docBody(req));
     if (req.method === 'GET' && url.pathname === '/healthz') return json(res, 200, { ok: true });
     if (req.method === 'GET' && url.pathname === '/api/cau-hinh') return json(res, 200, { canMa: !!MA_VAO });
     if (req.method === 'GET' && url.pathname === '/api/bang') return json(res, 200, { ds: bangXep().slice(0, 30) });
