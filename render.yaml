@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: chua-dac-hoi-thien-am
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: "true"
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: TZ
+        value: Asia/Ho_Chi_Minh
+      - key: MA_VAO
+        sync: false

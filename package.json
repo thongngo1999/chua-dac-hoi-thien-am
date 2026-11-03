@@ -1,0 +1,9 @@
+{
+  "name": "chua-dac-hoi-thien-am",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Game web 3D Đi chùa khi bị Sếp chửi",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
