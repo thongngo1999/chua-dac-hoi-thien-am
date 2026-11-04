@@ -80,7 +80,7 @@ function suKien(req, res, id) {
   req.on('close', () => { if (q.res === res) { q.res = null; q.roi = Date.now(); doi = true; } });
 }
 const dangOnline = () => [...nguoi.values()].filter(q => q.res);
-const banTin = () => { capNhatNgay(); return JSON.stringify({ homNay: denHomNay.size, ds: dangOnline().map(({ id, n, g, x, z, r, p, ao, phu, dh }) => ({ id, n, g, x, z, r, p, ao, phu, dh, h: bang[chuanTen(n)]?.d || 0 })) }); };
+const banTin = () => { capNhatNgay(); return JSON.stringify({ homNay: denHomNay.size, ds: dangOnline().map(({ id, n, g, x, z, r, p, ao, phu, dh }) => ({ id, n, g, x, z, r, p, ao, phu, dh, h: bang[chuanTen(n)]?.d || 0, t: bangTT[chuanTen(n)]?.d || 0 })) }); };
 
 /* ----- Bảng hạng: giữ điểm cao nhất của mỗi Pháp danh ----- */
 const bangXep = () => Object.values(bang).sort((a, b) => b.d - a.d);
@@ -117,8 +117,11 @@ function nopTT(res, b) {
   const bayGio = Date.now();
   if (bayGio - (q.ttLuc || 0) < 15000) return json(res, 429, { loi: 'Lượt chơi quá nhanh' });
   q.ttLuc = bayGio;
-  const k = chuanTen(q.n);
-  if (d > (bangTT[k]?.d ?? -1)) { bangTT[k] = { n: q.n, d }; ghiTT(); }
+  const k = chuanTen(q.n), cu = bangTT[k]?.d ?? -1;
+  if (d > cu) {
+    bangTT[k] = { n: q.n, d }; ghiTT(); doi = true;
+    if ([60, 85, 110, 135].some(m => d >= m && cu < m)) { const m = `data: ${JSON.stringify({ lenLop: { n: q.n, d } })}\n\n`; for (const p of dangOnline()) p.res.write(m); }
+  }
   json(res, 200, {});
 }
 
