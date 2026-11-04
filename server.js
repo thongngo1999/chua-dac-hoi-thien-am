@@ -10,6 +10,7 @@ const GIU_TEN_MS = 20000;     // Mất kết nối bao lâu thì nhả Pháp dan
 const GIAN_CACH_THI_MS = 20000; // Một lượt thi thật mất hơn 20 giây
 const TRANG = path.join(__dirname, 'index.html');
 const FILE_BANG = path.join(process.env.DATA_DIR || __dirname, 'bang-hang.json');
+const FILE_TT = path.join(process.env.DATA_DIR || __dirname, 'tri-tue.json');
 const FILE_DEN = path.join(process.env.DATA_DIR || __dirname, 'hoa-dang.json');
 const MA_VAO = (process.env.MA_VAO || '').trim(); // Đặt khi chạy trên internet để chỉ người có mã mới vào được
 
@@ -51,6 +52,8 @@ function vao(res, b) {
   // Máy chủ miễn phí có thể mất file khi khởi động lại: điểm cao nhất lưu trên máy người chơi sẽ tự ghi lại khi họ vào
   const hangCu = Math.round(so(b.hang, 0, 1000, 0)), kTen = chuanTen(ten);
   if (hangCu > (bang[kTen]?.d ?? 0)) { bang[kTen] = { n: ten, d: hangCu }; ghiBang(); }
+  const ttCu = Math.round(so(b.tt, 0, 150, 0));
+  if (ttCu > (bangTT[kTen]?.d ?? 0)) { bangTT[kTen] = { n: ten, d: ttCu }; ghiTT(); }
   // Tương tự, đèn hoa đăng công khai của người chơi được thả lại khi họ vào
   if (Array.isArray(b.den)) for (const d of b.den.slice(0, 5)) themDen(ten, d?.t, so(d?.ts, 0, 9e15, Date.now()));
   json(res, 200, { id });
@@ -99,6 +102,24 @@ function nopDiem(res, b) {
   }
   const ds = bangXep();
   json(res, 200, { viTri: ds.findIndex(x => chuanTen(x.n) === k) + 1, tong: ds.length, cao: Math.max(d, cu) });
+}
+
+/* ----- Bảng trí tuệ: điểm đố vui cao nhất của mỗi Pháp danh ----- */
+let bangTT = {};
+try { bangTT = JSON.parse(fs.readFileSync(FILE_TT, 'utf8')); } catch { bangTT = {}; }
+let henGhiTT = null;
+function ghiTT() { clearTimeout(henGhiTT); henGhiTT = setTimeout(() => fs.writeFile(FILE_TT, JSON.stringify(bangTT), () => {}), 500); }
+function nopTT(res, b) {
+  const q = nguoi.get(b.id);
+  if (!q) return json(res, 410, { loi: 'Phiên đã hết' });
+  const d = Math.round(so(b.d, 0, 150, -1));
+  if (d < 0) return json(res, 400, { loi: 'Điểm không hợp lệ' });
+  const bayGio = Date.now();
+  if (bayGio - (q.ttLuc || 0) < 15000) return json(res, 429, { loi: 'Lượt chơi quá nhanh' });
+  q.ttLuc = bayGio;
+  const k = chuanTen(q.n);
+  if (d > (bangTT[k]?.d ?? -1)) { bangTT[k] = { n: q.n, d }; ghiTT(); }
+  json(res, 200, {});
 }
 
 /* ----- Trò chuyện: chỉ giữ 50 tin gần nhất trong bộ nhớ, tắt máy chủ là mất ----- */
@@ -153,6 +174,8 @@ http.createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/vi-tri') return viTri(res, await docBody(req));
     if (req.method === 'POST' && url.pathname === '/api/diem') return nopDiem(res, await docBody(req));
     if (req.method === 'POST' && url.pathname === '/api/chat') return nopChat(res, await docBody(req));
+    if (req.method === 'POST' && url.pathname === '/api/tri-tue') return nopTT(res, await docBody(req));
+    if (req.method === 'GET' && url.pathname === '/api/bang-tt') return json(res, 200, { ds: Object.values(bangTT).sort((a, c) => c.d - a.d).slice(0, 20) });
     if (req.method === 'POST' && url.pathname === '/api/hoa-dang') return nopDen(res, await docBody(req));
     if (req.method === 'GET' && url.pathname === '/healthz') return json(res, 200, { ok: true });
     if (req.method === 'GET' && url.pathname === '/api/cau-hinh') return json(res, 200, { canMa: !!MA_VAO });

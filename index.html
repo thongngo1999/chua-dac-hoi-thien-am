@@ -47,6 +47,14 @@ button{cursor:pointer;border:0;background:none;touch-action:manipulation}
 .net-but{animation:viet 1s ease-out both}
 @keyframes viet{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 -5% 0 0)}}
 .an-son{position:absolute;right:12px;bottom:10px;padding:2px 5px;font-size:10px;color:#fbe9bd;border:1.5px solid #fbe9bd;border-radius:3px}
+.ds-dap{display:grid;grid-template-columns:1fr;gap:8px;width:min(100%,430px)}
+.dap{min-height:50px;padding:8px 14px;text-align:left;border-radius:11px;background:#2d150ff0;border:1.5px solid #e6b95f66;color:var(--giay);font-size:15.5px;font-weight:600;line-height:1.25}
+.dap.dung{background:#2f6a4ecc;border-color:var(--ngoc)}
+.dap.sai{background:#8a2a20cc}
+.luoi-the{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:min(84vw,340px)}
+.the-lat{aspect-ratio:1/.82;border-radius:11px;background:linear-gradient(135deg,var(--son-sang),var(--son));border:2px solid #e6b95f88;color:#160a06;font-family:"Water Brush",var(--chu-tieu-de);font-size:34px;line-height:1}
+.the-lat.mo{background:#f7ead0;border-color:var(--vang)}
+.the-lat.khop{background:#d9efd9;border-color:var(--ngoc)}
 .ds-nv{display:flex;flex-direction:column;gap:6px}
 .dong-nv{display:flex;flex-direction:column;padding:8px 11px;border-radius:9px;background:#ffffff0a;font-size:14px;font-weight:500}
 .dong-nv span{font-size:11.5px;color:var(--khoi);font-weight:400}
@@ -1047,7 +1055,7 @@ let donDep=null, capNhatHD=null;
 function batDauHoatDong(d){
   Am.bat(); cheDo.ten='hoatdong'; nutHD.hidden=true; diemGan=null; vao.x=vao.y=0; joyId=null; nuomVe(0,0);
   if(d.khoa&&!moKhu(d.khoa)){ hdKhoa(d.khoa,d.nhan); return; }
-  ({cv:()=>hdCoVat(d),cau:hdCauCa,ngam:hdNgam,vaohang:()=>{ ketThucHD(); dichChuyen(160,-3.6,Math.PI); capNhatTroi(); },rahang:()=>{ ketThucHD(); dichChuyen(100,-29,0); capNhatTroi(); },vaovuon:()=>{ ketThucHD(); dichChuyen(160,55.5,Math.PI); },ravuon:()=>{ ketThucHD(); dichChuyen(73,-30,0); },huong:hdHuong,chuong:hdChuong,mo:()=>hdMo(),lua:()=>hdCau('lua'),den:()=>hdCau('den'),que:hdQue,lay:hdLay,ngoi:hdNgoi,hoa:hdHoa,thien:hdThien,quet:hdQuet,ca:hdCa,chu:hdChu,tra:hdTra,hang:moDauHang}[d.id])();
+  ({tritue:hdTriTue,cv:()=>hdCoVat(d),cau:hdCauCa,ngam:hdNgam,vaohang:()=>{ ketThucHD(); dichChuyen(160,-3.6,Math.PI); capNhatTroi(); },rahang:()=>{ ketThucHD(); dichChuyen(100,-29,0); capNhatTroi(); },vaovuon:()=>{ ketThucHD(); dichChuyen(160,55.5,Math.PI); },ravuon:()=>{ ketThucHD(); dichChuyen(73,-30,0); },huong:hdHuong,chuong:hdChuong,mo:()=>hdMo(),lua:()=>hdCau('lua'),den:()=>hdCau('den'),que:hdQue,lay:hdLay,ngoi:hdNgoi,hoa:hdHoa,thien:hdThien,quet:hdQuet,ca:hdCa,chu:hdChu,tra:hdTra,hang:moDauHang}[d.id])();
 }
 function ketThucHD(){
   if(donDep){ const f=donDep; donDep=null; f(); }
@@ -1540,7 +1548,7 @@ async function ketThi(){
 function moDanhSach(){
   Am.bat(); if(cheDo.ten!=='choi') return;
   document.fonts?.load('40px "Water Brush"','Tâm Đức').catch(()=>{}); cheDo.ten='hoatdong'; nutHD.hidden=true; diemGan=null;
-  const lam={huong:so.incense,chuong:so.bells,mo:so.best,lua:so.prayers.some(p=>p.kind==='lua'),den:so.prayers.some(p=>p.kind==='den'),que:so.fortunes.length,lay:so.lay,ngoi:so.ngoi,hoa:so.hoa,thien:so.thien,quet:so.quet,ca:so.ca,chu:so.chu?.length,tra:so.tra,hang:so.hang};
+  const lam={huong:so.incense,chuong:so.bells,mo:so.best,lua:so.prayers.some(p=>p.kind==='lua'),den:so.prayers.some(p=>p.kind==='den'),que:so.fortunes.length,lay:so.lay,ngoi:so.ngoi,hoa:so.hoa,thien:so.thien,quet:so.quet,ca:so.ca,chu:so.chu?.length,tra:so.tra,hang:so.hang,tritue:so.ttDung,cau:so.caCau};
   moTam(`<h2>Làm gì ở chùa?</h2><p class="mo-ta">Chọn một việc, bạn sẽ được đưa tới gần chỗ đó.</p><div class="ds-hd">${DIEM.map((d,i)=>d.khongDS?'':`<button class="dong-hd" data-i="${i}"><span>${d.ten}</span><small>${d.khoa&&!moKhu(d.khoa)?`Khoá, cần ${CAN_NV[d.khoa]} nhiệm vụ`:lam[d.id]?'Đã làm':d.nhan}</small></button>`).join('')}</div><div class="hang"><button class="nut-phu" id="dong">Đóng</button></div>`);
   $('#dong').onclick=ketThucHD;
   tam.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{ const d=DIEM[+b.dataset.i]; if(d.khoa&&!moKhu(d.khoa)){ hdKhoa(d.khoa,d.nhan); return; } ketThucHD();
@@ -1579,6 +1587,7 @@ DIEM.push(
   {id:'ngam',ten:'Ngắm cảnh đỉnh núi',nhan:'Đỉnh Linh Quang',x:92,z:27.5,r:3.6,y:NUI.H+2.4,dung:[92,29],khoa:'dinh'},
   {id:'vaovuon',ten:'Đi lối sau thác',nhan:'Lối sau thác',x:73,z:-34.5,r:3.6,y:2.6,dung:[73,-31],khoa:'vuon'},
   {id:'ravuon',ten:'Trở ra thác nước',nhan:'Cổng vườn',x:160,z:53.5,r:2.8,y:2.4,khongDS:true},
+  {id:'tritue',ten:'Đố Trí Tuệ',nhan:'Đố Trí Tuệ',x:6.6,z:7.4,r:2.6,y:2.8},
   ...CO_VAT.map((c,i)=>({id:'cv',cv:i,ten:'Xem cổ vật',nhan:'Cổ vật',x:c.x,z:c.z,r:2.4,y:0,khongDS:true,an:()=>daTim(i)})));
 for(const d of DIEM) if(d.cv!==undefined) d.y=caoDo(d.x,d.z)+1.5;
 let cvIM,thacTex,muaPts,denHang;
@@ -1586,6 +1595,9 @@ function duongDa(x0,z0,x1,z1){ const l=Math.hypot(x1-x0,z1-z0),n=Math.ceil(l/1.9
   for(let i=0;i<=n;i++){ const x=lerp(x0,x1,i/n),z=lerp(z0,z1,i/n); stat.box(x,caoDo(x,z)+.03,z,2.2,.08,1.5,i%2?0x8f8574:0xa39783,a); } }
 function bienTen(chu,x,z,ry){ const y=caoDo(x,z); stat.box(x-1.2*Math.cos(ry),y+1,z+1.2*Math.sin(ry),.12,2,.12,C.go); stat.box(x+1.2*Math.cos(ry),y+1,z-1.2*Math.sin(ry),.12,2,.12,C.go); bien(chu,x,y+1.75,z,2.8,.62,ry); }
 function dungKhuNgoai(){
+  // Bảng Đố Trí Tuệ, đối diện bảng đấu hạng
+  stat.box(6.6,1.5,6,3,1.7,.14,C.go); stat.box(6.6,1.5,6.09,2.7,1.45,.03,0x2f5a4a); stat.cyl(5.4,.8,6,.08,.1,1.6,C.go,6); stat.cyl(7.8,.8,6,.08,.1,1.6,C.go,6); hop(5.1,8.1,5.85,6.15);
+  bien('Đố Trí Tuệ',6.6,1.5,6.12,2.3,.6);
   // Cổng nhỏ ở tường đông dẫn ra đường núi
   for(const s of [-1,1]) stat.box(22,1.7,CUA_Z+s*1.75,.8,3.4,.8,C.son);
   stat.box(22,3.55,CUA_Z,1,.3,4.6,C.go); mai(stat,22,3.7,CUA_Z,1.2,2.9,1.6,.9,.3); bien('Đường Lên Núi',21.46,3.05,CUA_Z,2.4,.46,-Math.PI/2);
@@ -1703,15 +1715,130 @@ function hdCauCa(){
   moi();
 }
 
+/* ======================= ĐỐ TRÍ TUỆ: CÂU ĐỐ HÔM NAY, ĐỐ VUI, GHÉP CẶP, SẮP CÂU ======================= */
+// Mỗi câu: chủ đề, câu hỏi, đáp án đúng, ba đáp án khác, lời giải thích
+const CAU_HOI=[
+  ['Phật pháp','Thái tử trước khi xuất gia thành Phật có tên là gì?','Tất-đạt-đa','A-nan-đà','Mục-kiền-liên','Xá-lợi-phất','Thái tử Tất-đạt-đa về sau là Phật Thích Ca Mâu Ni.'],
+  ['Phật pháp','Theo truyền thống, Đức Phật đản sinh ở đâu?','Vườn Lâm-tỳ-ni','Vườn Lộc Uyển','Thành Vương Xá','Núi Linh Thứu','Vườn Lâm-tỳ-ni ngày nay thuộc Nepal.'],
+  ['Phật pháp','Đức Phật thành đạo dưới gốc cây gì?','Cây bồ đề','Cây đa','Cây sala','Cây sen','Vì thế cây bồ đề thường được trồng trong sân chùa.'],
+  ['Phật pháp','Bài pháp đầu tiên của Đức Phật được giảng ở đâu?','Vườn Lộc Uyển','Vườn Lâm-tỳ-ni','Câu-thi-na','Bồ Đề Đạo Tràng','Bài pháp này nói về Tứ Diệu Đế.'],
+  ['Phật pháp','Tứ Diệu Đế gồm những gì?','Khổ, Tập, Diệt, Đạo','Tham, Sân, Si, Mạn','Giới, Định, Tuệ, Từ','Phật, Pháp, Tăng, Đạo','Đây là bốn sự thật mà Đức Phật giảng đầu tiên.'],
+  ['Phật pháp','Tam Bảo là ba ngôi báu nào?','Phật, Pháp, Tăng','Giới, Định, Tuệ','Tham, Sân, Si','Bi, Trí, Dũng','Quy y Tam Bảo là nương tựa Phật, Pháp, Tăng.'],
+  ['Phật pháp','Tam độc trong đạo Phật là gì?','Tham, sân, si','Giới, định, tuệ','Khổ, tập, diệt','Sinh, lão, tử','Ba thứ này được xem là gốc của phiền não.'],
+  ['Phật pháp','Điều nào KHÔNG thuộc năm giới của người tại gia?','Không ăn trưa','Không sát sinh','Không nói dối','Không trộm cắp','Năm giới gồm không sát sinh, trộm cắp, tà dâm, nói dối, uống rượu.'],
+  ['Phật pháp','Bát Chánh Đạo có bao nhiêu chi?','8','4','5','10','Bát nghĩa là tám, gồm chánh kiến, chánh tư duy và sáu chi khác.'],
+  ['Phật pháp','Đức Phật nhập Niết-bàn ở đâu?','Câu-thi-na','Lâm-tỳ-ni','Lộc Uyển','Xá-vệ','Câu-thi-na là một trong bốn thánh tích lớn.'],
+  ['Phật pháp','Vị Bồ Tát nào được biết đến là lắng nghe tiếng kêu khổ của chúng sinh?','Quán Thế Âm','Văn Thù','Phổ Hiền','Địa Tạng','Quán Thế Âm nghĩa là quán xét âm thanh của cuộc đời.'],
+  ['Phật pháp','Vị Bồ Tát nào tượng trưng cho trí tuệ?','Văn Thù','Quán Thế Âm','Địa Tạng','Di Lặc','Văn Thù thường được tạc với thanh gươm trí tuệ.'],
+  ['Phật pháp','Vị Phật nào gắn với cõi Tây Phương Cực Lạc?','A Di Đà','Dược Sư','Di Lặc','Nhiên Đăng','Vì vậy người tụng niệm "Nam mô A Di Đà Phật".'],
+  ['Phật pháp','Vị Phật nào được xem là Phật của tương lai?','Di Lặc','A Di Đà','Dược Sư','Thích Ca','Di Lặc thường được tạc với dáng tươi cười.'],
+  ['Phật pháp','Mẹ của thái tử Tất-đạt-đa là ai?','Hoàng hậu Ma-da','Da-du-đà-la','Ma-ha Ba-xà-ba-đề','Hoàng hậu Vi-đề-hy','Hoàng hậu Ma-da mất ít ngày sau khi sinh thái tử.'],
+  ['Phật pháp','Lễ Vu Lan gắn với câu chuyện của vị nào?','Mục Kiền Liên','Xá Lợi Phất','A Nan','Ca Diếp','Câu chuyện kể ngài Mục Kiền Liên cứu mẹ.'],
+  ['Phật pháp','Lễ Vu Lan thường diễn ra vào thời gian nào?','Rằm tháng 7 âm lịch','Rằm tháng Giêng','Mùng 8 tháng 4','Rằm tháng 8','Đây là mùa báo hiếu cha mẹ.'],
+  ['Phật pháp','Trong Bát Nhã Tâm Kinh có câu nào sau đây?','Sắc tức thị không','Có công mài sắt','Tâm bình thế giới bình','Vạn sự như ý','Câu đầy đủ là "sắc tức thị không, không tức thị sắc".'],
+  ['Phật pháp','Vì sao hoa sen hay gắn với đạo Phật?','Mọc từ bùn mà vẫn thanh khiết','Chỉ nở vào ban đêm','Có nhiều gai','Chỉ mọc ở Ấn Độ','Sen là hình ảnh của sự thanh tịnh giữa đời.'],
+  ['Chùa Việt','Chùa Một Cột nằm ở đâu?','Hà Nội','Huế','Bắc Ninh','Ninh Bình','Chùa được dựng năm 1049 thời vua Lý Thái Tông.'],
+  ['Chùa Việt','Chùa Thiên Mụ nằm ở thành phố nào?','Huế','Đà Nẵng','Hội An','Nha Trang','Chùa nằm bên bờ sông Hương.'],
+  ['Chùa Việt','Bài thơ "Chùa Hương" là của tác giả nào?','Nguyễn Nhược Pháp','Hàn Mặc Tử','Xuân Diệu','Nguyễn Bính','Bài thơ kể chuyện cô gái mười lăm đi trẩy hội.'],
+  ['Chùa Việt','Thiền phái Trúc Lâm Yên Tử do ai sáng lập?','Trần Nhân Tông','Lý Công Uẩn','Trần Hưng Đạo','Lê Thánh Tông','Vua Trần Nhân Tông xuất gia và được tôn là Phật hoàng.'],
+  ['Chùa Việt','Non thiêng Yên Tử thuộc tỉnh nào?','Quảng Ninh','Thanh Hoá','Nghệ An','Lạng Sơn','Yên Tử gắn với Thiền phái Trúc Lâm.'],
+  ['Chùa Việt','Chùa Bái Đính nằm ở tỉnh nào?','Ninh Bình','Hà Nam','Nam Định','Thái Bình','Quần thể chùa nằm gần cố đô Hoa Lư.'],
+  ['Chùa Việt','Chùa Trấn Quốc nằm bên hồ nào?','Hồ Tây','Hồ Gươm','Hồ Trúc Bạch','Hồ Thiền Quang','Đây là một trong những ngôi chùa cổ của Hà Nội.'],
+  ['Chùa Việt','Chùa Dâu, một trong những chùa cổ của Việt Nam, ở tỉnh nào?','Bắc Ninh','Phú Thọ','Hải Dương','Hưng Yên','Vùng Luy Lâu xưa là trung tâm Phật giáo sớm.'],
+  ['Chùa Việt','"Tam quan" trong cổng chùa nghĩa là gì?','Ba cửa','Ba tầng','Ba mái','Ba vị quan','Cổng thường có một lối giữa và hai lối bên.'],
+  ['Chùa Việt','Chiếc mõ trong chùa thường được tạc theo hình con gì?','Cá','Rồng','Hạc','Rùa','Cá không nhắm mắt, gợi lời nhắc giữ tỉnh thức.'],
+  ['Chùa Việt','Câu nào nói về làng quê Việt có ngôi chùa?','Đất vua, chùa làng, phong cảnh Bụt','Ăn cháo đá bát','Nước chảy đá mòn','Đi đâu cũng về nhà','Câu này cho thấy chùa gắn bó với cộng đồng làng.'],
+  ['Tục ngữ','Uống nước nhớ ...','nguồn','sông','giếng','mưa','Câu nhắc phải biết ơn nơi mình được hưởng.'],
+  ['Tục ngữ','Ăn quả nhớ kẻ ... cây','trồng','chặt','tưới','hái','Biết ơn người đã làm ra thành quả.'],
+  ['Tục ngữ','Có công mài sắt, có ngày nên ...','kim','dao','cuốc','đồng','Kiên trì sẽ thành công.'],
+  ['Tục ngữ','Gần mực thì đen, gần đèn thì ...','rạng','sáng','tối','nóng','Môi trường ảnh hưởng đến mỗi người.'],
+  ['Tục ngữ','Một cây làm chẳng nên non, ba cây chụm lại nên hòn ...','núi cao','đá to','rừng xanh','đồi nhỏ','Đoàn kết mới làm được việc lớn.'],
+  ['Tục ngữ','Lá lành đùm lá ...','rách','khô','xanh','non','Người khoẻ giúp người yếu.'],
+  ['Tục ngữ','Tốt gỗ hơn tốt nước ...','sơn','mưa','sông','biển','Phẩm chất bên trong quý hơn vẻ ngoài.'],
+  ['Tục ngữ','Học thầy không tày học ...','bạn','sách','trò','đời','Bạn bè cũng là người thầy gần gũi.'],
+  ['Tục ngữ','Thương người như thể thương ...','thân','nhà','con','mẹ','Câu dạy sống yêu thương.'],
+  ['Tục ngữ','Đi một ngày đàng học một sàng ...','khôn','gạo','chữ','thóc','Đi nhiều biết nhiều.'],
+  ['Tục ngữ','Công cha như núi Thái Sơn, nghĩa mẹ như nước trong ... chảy ra','nguồn','sông','suối','biển','Câu ca dao về công ơn cha mẹ.'],
+  ['Tục ngữ','Tu đâu cho bằng tu nhà, thờ cha kính mẹ mới là ... tu','chân','thật','người','đi','Hiếu thảo ở nhà cũng là tu.'],
+  ['Tục ngữ','Giấy rách phải giữ lấy ...','lề','chữ','mực','bìa','Khó khăn vẫn giữ nếp sống tốt.'],
+  ['Tục ngữ','Ở hiền gặp ...','lành','may','bạn','phúc','Câu khuyên sống hiền hoà.'],
+  ['Tục ngữ','Chớ thấy sóng cả mà ngã tay ...','chèo','lái','thuyền','buồm','Đừng nản trước khó khăn.'],
+  ['Tục ngữ','Cái nết đánh chết cái ...','đẹp','xấu','giàu','hay','Nết na quý hơn nhan sắc.'],
+  ['Mẹo trí','Cái gì càng lấy đi càng to?','Cái hố','Quả bóng','Cái bánh','Cuốn sách','Đào đất càng nhiều, hố càng to.'],
+  ['Mẹo trí','Cái gì là của bạn nhưng người khác dùng nhiều hơn bạn?','Tên của bạn','Điện thoại','Đôi dép','Chiếc xe','Người khác gọi tên bạn nhiều hơn bạn tự gọi.'],
+  ['Mẹo trí','Số tiếp theo: 2, 4, 8, 16, ...','32','24','20','18','Mỗi số gấp đôi số trước.'],
+  ['Mẹo trí','Số tiếp theo: 1, 1, 2, 3, 5, ...','8','6','7','9','Mỗi số bằng tổng hai số liền trước.'],
+  ['Mẹo trí','Chạy thi, bạn vượt người đang đứng thứ hai. Bạn đứng thứ mấy?','Thứ hai','Thứ nhất','Thứ ba','Không biết','Bạn chỉ thế chỗ người thứ hai.'],
+  ['Mẹo trí','Hôm kia là thứ Hai thì hôm nay là thứ mấy?','Thứ Tư','Thứ Ba','Thứ Năm','Chủ nhật','Hôm kia cách hôm nay hai ngày.'],
+  ['Mẹo trí','5 máy làm 5 sản phẩm trong 5 phút. 100 máy làm 100 sản phẩm mất bao lâu?','5 phút','100 phút','20 phút','1 phút','Mỗi máy làm một sản phẩm trong 5 phút.'],
+  ['Mẹo trí','Sợi dây 10 mét, mỗi nhát cắt được 1 đoạn 1 mét. Cần mấy nhát để cắt hết?','9 nhát','10 nhát','11 nhát','5 nhát','Nhát thứ chín để lại đoạn cuối dài đúng 1 mét.'],
+  ['Mẹo trí','Lá sen phủ gấp đôi mỗi ngày, ngày 48 kín hồ. Ngày nào phủ nửa hồ?','Ngày 47','Ngày 24','Ngày 40','Ngày 46','Chỉ cần một ngày nhân đôi là kín hồ.'],
+  ['Mẹo trí','Nén hương và bình hoa giá 11 nghìn. Bình đắt hơn hương đúng 10 nghìn. Hương giá bao nhiêu?','500 đồng','1 nghìn','1 nghìn rưỡi','2 nghìn','500 đồng cộng 10.500 đồng là 11 nghìn.'],
+  ['Mẹo trí','4 con mèo bắt 4 con chuột trong 4 phút. Bắt 100 chuột trong 100 phút cần mấy mèo?','4 con','100 con','25 con','8 con','Mỗi mèo bắt 1 chuột trong 4 phút.'],
+  ['Mẹo trí','Trong phòng có 3 ngọn nến đang cháy, thổi tắt 1 ngọn. Sáng hôm sau còn nguyên bao nhiêu ngọn?','1 ngọn','2 ngọn','3 ngọn','0 ngọn','Hai ngọn đang cháy đã tan hết, chỉ còn ngọn bị thổi tắt.'],
+  ['Mẹo trí','Tháng nào trong năm có 28 ngày?','Tất cả các tháng','Tháng 2','Tháng 1 và 2','Không tháng nào','Tháng nào cũng có ít nhất 28 ngày.']];
+const CAU_SAP=['Uống nước nhớ nguồn','Ăn quả nhớ kẻ trồng cây','Có công mài sắt có ngày nên kim','Gần mực thì đen gần đèn thì rạng','Lá lành đùm lá rách','Thương người như thể thương thân','Học thầy không tày học bạn','Đi một ngày đàng học một sàng khôn','Tốt gỗ hơn tốt nước sơn','Giấy rách phải giữ lấy lề','Chớ thấy sóng cả mà ngã tay chèo','Tâm bình thế giới bình','Nguyện đem công đức này hướng về khắp tất cả','Một cây làm chẳng nên non'];
+const THE_GHEP=['Sen','Chuông','Mõ','Hương','Trúc','Kinh','Tâm','An','Trà','Nến','Đèn','Thiền'];
+const tronDS=a=>{ const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+const ngayHom=(lech=0)=>{ const d=new Date(Date.now()-lech*864e5); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; };
+function hdTriTue(){ const hn=ngayHom(), xongHN=so.ttNgay===hn;
+  moTam(`<h2>Đố Trí Tuệ</h2><p class="mo-ta">Chơi cho vui, sai cũng không sao. Mỗi câu đều có lời giải thích.</p>
+    <div class="ds-hd"><button class="dong-hd" id="tt-ngay"><span>Câu đố hôm nay</span><small>${xongHN?'Đã làm hôm nay':'Chưa làm'} · Chuỗi ${so.ttChuoi||0} ngày</small></button><button class="dong-hd" id="tt-do"><span>Đố vui 10 câu</span><small>Cao nhất ${so.ttCao||0}/150</small></button><button class="dong-hd" id="tt-ghep"><span>Lật thẻ ghép cặp</span><small>${so.ttGhepIt?'Ít nhất '+so.ttGhepIt+' lượt':'Chưa chơi'}</small></button><button class="dong-hd" id="tt-sap"><span>Sắp câu tục ngữ</span><small>Đã xong ${so.ttSap||0} lượt</small></button></div>
+    <h3>Bảng trí tuệ</h3><div id="bang-tt"><p class="nhe">${maPhien?'Đang tải…':'Cần máy chủ để có bảng chung.'}</p></div>
+    <div class="hang"><button class="nut-phu" id="dong">Đóng</button></div>`);
+  $('#dong').onclick=ketThucHD; const vaoGame=f=>()=>{ tam.hidden=true; f(); };
+  $('#tt-ngay').onclick=vaoGame(cauHomNay); $('#tt-do').onclick=vaoGame(doVui); $('#tt-ghep').onclick=vaoGame(ghepCap); $('#tt-sap').onclick=vaoGame(sapCau);
+  if(maPhien) fetch('/api/bang-tt').then(r=>r.json()).then(j=>{ const e=$('#bang-tt'); if(e) e.innerHTML=j.ds.length?`<ol style="margin:0;padding:0;list-style:none">${j.ds.map((q,i)=>`<li class="dong-bang${q.n===so.name?' toi':''}" style="grid-template-columns:24px minmax(0,1fr) 54px"><span>${i+1}</span><span class="tn">${esc(q.n)}</span><b>${q.d}</b></li>`).join('')}</ol>`:'<p class="nhe">Chưa ai có điểm. Bạn mở hàng nhé.</p>'; }).catch(()=>{ const e=$('#bang-tt'); if(e) e.innerHTML='<p class="nhe">Chưa tải được bảng.</p>'; });
+}
+function hoiCau(q,tieu,xong){ // Hiện một câu hỏi có đồng hồ 20 giây, gọi xong(đúng, điểm thưởng) khi người chơi bấm Tiếp
+  const dap=tronDS([q[2],q[3],q[4],q[5]]); let con=20,da=false;
+  moPhu(`<div class="dau"><p class="nhe">${tieu} · ${q[0]}</p><div class="tien-do" style="width:100%"><i id="dh-tt" style="width:100%"></i></div></div>
+    <div class="giua" style="flex-direction:column;gap:9px;justify-content:flex-start;overflow:auto"><p style="font-family:var(--chu-tieu-de);font-weight:700;font-size:22px;line-height:1.25;max-width:430px">${esc(q[1])}</p><div class="ds-dap">${dap.map((d,i)=>`<button class="dap" data-d="${i}">${esc(d)}</button>`).join('')}</div><p id="gt-tt" style="max-width:430px;font-size:15px;line-height:1.4"></p></div>
+    <div class="cuoi"><button class="nut-lon" id="tiep-tt" hidden>Tiếp</button><button class="nut-phu" id="thoat-tt">Thoát</button></div>`);
+  $('#thoat-tt').onclick=()=>{ capNhatHD=null; hdTriTue(); phu.hidden=true; };
+  const chot=i=>{ if(da) return; da=true; capNhatHD=null; const dung=i>=0&&dap[i]===q[2], thuong=dung?10+Math.round(5*con/20):0;
+    phu.querySelectorAll('.dap').forEach((b,k)=>{ b.disabled=true; if(dap[k]===q[2]) b.classList.add('dung'); else if(k===i) b.classList.add('sai'); });
+    if(dung){ so.ttDung=(so.ttDung||0)+1; luu(); Am.ting(1320,.08); } else Am.ting(330,.06);
+    $('#gt-tt').textContent=(dung?`Đúng rồi, +${thuong}. `:i<0?'Hết giờ rồi. ':'Chưa đúng. ')+q[6]; const t=$('#tiep-tt'); t.hidden=false; t.onclick=()=>xong(dung,thuong); };
+  phu.querySelectorAll('.dap').forEach(b=>b.onclick=()=>chot(+b.dataset.d));
+  capNhatHD=dt=>{ con-=dt; const e=$('#dh-tt'); if(e) e.style.width=Math.max(0,con/20*100)+'%'; if(con<=0) chot(-1); };
+}
+function ketDon(tieu,noi,lai){ moPhu(`<div class="dau"><h2>${tieu}</h2></div><div class="giua" style="flex-direction:column;gap:12px">${noi}</div><div class="cuoi">${lai?'<button class="nut-lon" id="lai-tt">Chơi lại</button>':''}<button class="${lai?'nut-phu':'nut-lon'}" id="ve-tt">Về Đố Trí Tuệ</button></div>`); if(lai) $('#lai-tt').onclick=lai; $('#ve-tt').onclick=()=>{ phu.hidden=true; hdTriTue(); }; }
+function cauHomNay(){ const hn=ngayHom(); let h=0; for(const c of hn) h=(h*31+c.charCodeAt(0))>>>0; const q=CAU_HOI[h%CAU_HOI.length];
+  if(so.ttNgay===hn){ ketDon('Câu đố hôm nay',`<p style="max-width:330px;font-size:18px;line-height:1.45">Bạn đã làm câu hôm nay rồi. Ngày mai quay lại để giữ chuỗi nhé.</p><div class="diem-so" style="font-size:60px">${so.ttChuoi||1}</div><p class="nhe">ngày liên tiếp</p>`); return; }
+  hoiCau(q,'Câu đố hôm nay',dung=>{ so.ttChuoi=so.ttNgay===ngayHom(1)?(so.ttChuoi||0)+1:1; so.ttNgay=hn; so.ttNgayLam=(so.ttNgayLam||0)+1; luu(); ketDon('Câu đố hôm nay',`<div class="diem-so" style="font-size:60px">${so.ttChuoi}</div><p class="nhe">ngày liên tiếp</p><p style="font-size:17px">${dung?'Bạn trả lời đúng. Ngày mai còn câu mới.':'Sai không sao, ngày mai còn câu mới.'}</p>`); }); }
+function doVui(){ so.ttDa=so.ttDa||[]; let ds=CAU_HOI.map((_,i)=>i).filter(i=>!so.ttDa.includes(i)); if(ds.length<10){ so.ttDa=[]; ds=CAU_HOI.map((_,i)=>i); }
+  const chon=tronDS(ds).slice(0,10); let i=0,tong=0,dem=0;
+  const hoi=()=>hoiCau(CAU_HOI[chon[i]],`Câu ${i+1} trên 10`,(dung,th)=>{ tong+=th; if(dung) dem++; so.ttDa.push(chon[i]); i++; if(i<10) hoi(); else het(); });
+  const het=()=>{ const moi=tong>(so.ttCao||0); if(moi) so.ttCao=tong; so.ttLuot=(so.ttLuot||0)+1; if(dem===10) so.tt10=(so.tt10||0)+1; if(so.ttDa.length>40) so.ttDa=so.ttDa.slice(-40); luu(); if(maPhien&&moi) goi('/api/tri-tue',{id:maPhien,d:tong}).catch(()=>{}); Am.chuong(.3);
+    ketDon('Kết quả',`<div class="diem-so">${tong}</div><p class="nhe">Đúng ${dem} trên 10 · ${moi?'Điểm cao nhất mới':'Cao nhất '+so.ttCao}</p><p style="max-width:330px;font-size:17px">${dem>=9?'Bạn đọc nhiều và nhớ lâu thật đấy.':dem>=6?'Rất khá, thêm một lượt là cao hơn.':'Mỗi câu sai là một điều mới biết thêm.'}</p>`,doVui); };
+  hoi(); }
+function ghepCap(){ const chu=tronDS(THE_GHEP).slice(0,6), bo=tronDS([...chu,...chu]); let mo=[],khoa=false,luot=0,xong=0;
+  moPhu(`<div class="dau"><h2>Lật thẻ ghép cặp</h2><p class="nhe" id="luot-g">0 lượt</p></div><div class="giua"><div class="luoi-the">${bo.map((c,i)=>`<button class="the-lat" data-i="${i}" aria-label="Thẻ ${i+1}"></button>`).join('')}</div></div><div class="cuoi"><button class="nut-phu" id="thoat-tt">Thoát</button></div>`);
+  $('#thoat-tt').onclick=()=>{ phu.hidden=true; hdTriTue(); };
+  phu.querySelectorAll('.the-lat').forEach(b=>b.onclick=()=>{ if(khoa||b.classList.contains('mo')) return; b.classList.add('mo'); b.textContent=bo[+b.dataset.i]; Am.ting(880,.03); mo.push(b); if(mo.length<2) return;
+    luot++; $('#luot-g').textContent=`${luot} lượt`; const [a,c]=mo; mo=[];
+    if(bo[+a.dataset.i]===bo[+c.dataset.i]){ a.classList.add('khop'); c.classList.add('khop'); xong++; Am.ting(1320,.06);
+      if(xong===6){ so.ttGhep=(so.ttGhep||0)+1; const moi=!so.ttGhepIt||luot<so.ttGhepIt; if(moi) so.ttGhepIt=luot; luu(); setTimeout(()=>ketDon('Đã ghép xong',`<div class="diem-so">${luot}</div><p class="nhe">lượt lật · ${moi?'Kỷ lục mới của bạn':'Ít nhất '+so.ttGhepIt}</p>`,ghepCap),500); } }
+    else { khoa=true; setTimeout(()=>{ a.classList.remove('mo'); c.classList.remove('mo'); a.textContent=c.textContent=''; khoa=false; },800); } }); }
+function sapCau(){ const ds=tronDS(CAU_SAP).slice(0,5); let i=0,sai=0;
+  const ve=()=>{ const tu=ds[i].split(' '); let n=0; const luoi=tronDS(tu.map((t,k)=>({t,k})));
+    moPhu(`<div class="dau"><h2>Sắp câu</h2><p class="nhe">Câu ${i+1} trên 5 · Chạm các chữ theo đúng thứ tự</p></div><div class="giua" style="flex-direction:column;gap:18px"><p id="da-sap" style="min-height:64px;font-family:var(--chu-tieu-de);font-weight:700;font-size:23px;line-height:1.3;max-width:420px">…</p><div class="hang" style="justify-content:center;gap:7px;max-width:420px">${luoi.map((x,k)=>`<button class="chip" style="flex:0 0 auto;min-height:46px;font-size:16px" data-k="${k}">${esc(x.t)}</button>`).join('')}</div><p class="nhe" id="sai-s"></p></div><div class="cuoi"><button class="nut-phu" id="thoat-tt">Thoát</button></div>`);
+    $('#thoat-tt').onclick=()=>{ phu.hidden=true; hdTriTue(); };
+    phu.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ const x=luoi[+b.dataset.k]; if(x.t===tu[n]){ n++; b.style.visibility='hidden'; $('#da-sap').textContent=tu.slice(0,n).join(' '); Am.ting(990,.04); if(n===tu.length){ i++; Am.ting(1320,.07); setTimeout(()=>i<5?ve():het(),650); } } else { sai++; Am.ting(330,.05); $('#sai-s').textContent='Chưa đúng chữ này, thử chữ khác nhé.'; } }); };
+  const het=()=>{ so.ttSap=(so.ttSap||0)+1; luu(); ketDon('Đã sắp xong',`<div class="diem-so">${sai}</div><p class="nhe">lần chạm nhầm trong 5 câu</p><p style="max-width:320px;font-size:17px">${sai===0?'Không sai chữ nào, thuộc lòng thật.':'Đọc lại vài lần là thuộc ngay.'}</p>`,sapCau); };
+  ve(); }
+
 /* ======================= ĐIỂM HÀNH HƯƠNG, DANH HIỆU, CỬA HÀNG, MENU ======================= */
-const diemTong=()=>so.incense*5+so.bells*2+so.prayers.length*5+so.fortunes.length*2+(so.lay||0)*5+(so.hoa||0)*4+(so.thien||0)*6+(so.quet||0)*6+(so.ca||0)*3+(so.chu?.length||0)*2+(so.tra||0)*2+(so.ngoi||0)+(so.tung||0)*8+(so.luotThi||0)*4+Math.round((so.best||0)/2)+Object.keys(so.khu||{}).length*15+(so.coVat||[]).length*10+(so.caCau||0)*3;
+const diemTong=()=>so.incense*5+so.bells*2+so.prayers.length*5+so.fortunes.length*2+(so.lay||0)*5+(so.hoa||0)*4+(so.thien||0)*6+(so.quet||0)*6+(so.ca||0)*3+(so.chu?.length||0)*2+(so.tra||0)*2+(so.ngoi||0)+(so.tung||0)*8+(so.luotThi||0)*4+Math.round((so.best||0)/2)+Object.keys(so.khu||{}).length*15+(so.coVat||[]).length*10+(so.caCau||0)*3+(so.ttDung||0)+(so.ttGhep||0)*3+(so.ttSap||0)*3+(so.ttNgayLam||0)*5;
 const diemCon=()=>Math.max(0,diemTong()-(so.tieu||0));
 const soDen=()=>so.prayers.filter(p=>p.kind==='den').length, soKhu=()=>Object.keys(so.khu||{}).length, soCv=()=>(so.coVat||[]).length;
 const DANH_HIEU=[
   ['Khám phá','Bước Chân Đầu Tiên','Khám phá 1 khu vực',()=>soKhu()>=1],['Khám phá','Người Tìm Đường','Khám phá 4 khu vực',()=>soKhu()>=4],['Khám phá','Lữ Khách Đỉnh Mây','Lên Đỉnh Linh Quang',()=>so.khu?.dinh],['Khám phá','Người Mở Cửa Bí Mật','Vào Vườn Sen Cổ',()=>so.khu?.vuon],
   ['Cộng đồng','Người Quét Sân','Quét sân 3 lần',()=>(so.quet||0)>=3],['Cộng đồng','Bàn Tay Công Quả','Quét sân, dâng lễ, phóng sinh 10 lần',()=>(so.quet||0)+(so.hoa||0)+(so.ca||0)>=10],['Cộng đồng','Người Thắp Đèn','Thả 3 đèn hoa đăng',()=>soDen()>=3],['Cộng đồng','Bạn Đồng Hành','Gửi 5 tin nhắn chào hỏi',()=>(so.chatGui||0)>=5],
   ['Sưu tập','Nhà Sưu Tầm Tập Sự','Tìm 3 cổ vật',()=>soCv()>=3],['Sưu tập','Người Giữ Ký Ức','Tìm 8 cổ vật',()=>soCv()>=8],['Sưu tập','Người Giữ Bảo Tàng','Tìm đủ cổ vật',()=>soCv()>=CO_VAT.length],['Sưu tập','Ngư Ông Hiền Lành','Câu và thả 10 chú cá',()=>(so.caCau||0)>=10],['Sưu tập','Ngư Ông Từ Bi','Biết đủ các loài cá',()=>Object.keys(so.loaiCa||{}).length>=LOAI_CA.length],
-  ['Tu tập','Người Tụng Kinh','Tụng xong 3 bài',()=>(so.tung||0)>=3],['Tu tập','Tâm Như Mặt Hồ','Tâm an từ 85 trở lên',()=>(so.best||0)>=85],['Tu tập','Tay Hương Kỳ Nam','Đạt hạng Kỳ Nam',()=>(so.hang||0)>=850]];
+  ['Tu tập','Người Tụng Kinh','Tụng xong 3 bài',()=>(so.tung||0)>=3],['Tu tập','Tâm Như Mặt Hồ','Tâm an từ 85 trở lên',()=>(so.best||0)>=85],['Tu tập','Tay Hương Kỳ Nam','Đạt hạng Kỳ Nam',()=>(so.hang||0)>=850],
+  ['Trí tuệ','Người Ham Học','Trả lời đúng 20 câu',()=>(so.ttDung||0)>=20],['Trí tuệ','Trí Tuệ Sáng Soi','Đúng cả 10 câu một lượt',()=>(so.tt10||0)>=1],['Trí tuệ','Mỗi Ngày Một Câu','Giữ chuỗi câu đố 7 ngày',()=>(so.ttChuoi||0)>=7],['Trí tuệ','Trí Nhớ Tốt','Ghép cặp trong 10 lượt',()=>so.ttGhepIt&&so.ttGhepIt<=10]];
 let diemCu=null, dhCu=null;
 function capNhatDiemHanhHuong(){ const d=diemTong(), dh=DANH_HIEU.filter(x=>x[3]()).map(x=>x[1]);
   if(diemCu!==null&&d>diemCu&&cheDo.ten==='choi'&&!$('#loi-bao').classList.contains('hien')) baoNhe(`+${d-diemCu} điểm hành hương`);
@@ -1733,8 +1860,8 @@ function moShop(){ cheDo.ten='hoatdong'; nutHD.hidden=true; diemGan=null; so.kho
     if(x[2]==='ao') so.ao=x[0]; else { const ds=(so.phu||'').split(',').filter(Boolean); so.phu=(ds.includes(x[0])?ds.filter(k=>k!==x[0]):[...ds,x[0]]).join(','); }
     luu(); apTrangPhuc(nv,so.ao,so.phu); moShop(); }); }
 function moMenu(){ if(cheDo.ten!=='choi') return; Am.bat(); cheDo.ten='hoatdong'; nutHD.hidden=true; diemGan=null;
-  const MUC=[['hd','Hoạt động','Đi tới từng chỗ trong chùa'],['nv','Nhiệm vụ và khu vực',`${soNV()} trên ${NHIEM_VU.length} nhiệm vụ`],['shop','Cửa hàng áo',`${diemCon()} điểm hành hương`],['dh','Danh hiệu',`${DANH_HIEU.filter(x=>x[3]()).length} trên ${DANH_HIEU.length}`],['cv','Cổ vật',`${soCv()} trên ${CO_VAT.length}`],['tt','Thời tiết',`${tenGio()}, ${TEN_TT[TT.hien]}`],['hang','Đấu hạng','Thi tay nghề dâng hương'],['so','Sổ cầu an','Lời cầu, quẻ, chữ đã xin'],['cs','Chia sẻ','Tạo ảnh lời cầu an']];
-  const CHAY={hd:()=>$('#nut-hd').click(),nv:moNhiemVu,shop:moShop,dh:moDanhHieu,cv:moCoVat,tt:moThoiTiet,hang:()=>$('#nut-hang').click(),so:()=>$('#nut-so').click(),cs:()=>$('#nut-chia-se').click()};
+  const MUC=[['hd','Hoạt động','Đi tới từng chỗ trong chùa'],['tt2','Đố Trí Tuệ',so.ttNgay===ngayHom()?`Chuỗi ${so.ttChuoi||0} ngày`:'Có câu đố hôm nay'],['nv','Nhiệm vụ và khu vực',`${soNV()} trên ${NHIEM_VU.length} nhiệm vụ`],['shop','Cửa hàng áo',`${diemCon()} điểm hành hương`],['dh','Danh hiệu',`${DANH_HIEU.filter(x=>x[3]()).length} trên ${DANH_HIEU.length}`],['cv','Cổ vật',`${soCv()} trên ${CO_VAT.length}`],['tt','Thời tiết',`${tenGio()}, ${TEN_TT[TT.hien]}`],['hang','Đấu hạng','Thi tay nghề dâng hương'],['so','Sổ cầu an','Lời cầu, quẻ, chữ đã xin'],['cs','Chia sẻ','Tạo ảnh lời cầu an']];
+  const CHAY={tt2:()=>{ cheDo.ten='hoatdong'; hdTriTue(); },hd:()=>$('#nut-hd').click(),nv:moNhiemVu,shop:moShop,dh:moDanhHieu,cv:moCoVat,tt:moThoiTiet,hang:()=>$('#nut-hang').click(),so:()=>$('#nut-so').click(),cs:()=>$('#nut-chia-se').click()};
   moTam(`<h2>${TEN_CHUA}</h2><div class="ds-hd">${MUC.map(m=>`<button class="dong-hd" data-m="${m[0]}"><span>${m[1]}</span><small>${m[2]}</small></button>`).join('')}</div><div class="hang"><button class="nut-phu" id="dong">Đóng</button></div>`);
   $('#dong').onclick=ketThucHD; tam.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ cheDo.ten='choi'; tam.hidden=true; CHAY[b.dataset.m](); }); }
 $('#nut-menu').onclick=moMenu;
@@ -1844,7 +1971,7 @@ async function guiViTri(){
 async function dangKy(ten,g){ // Trả về thông báo lỗi nếu Pháp danh không dùng được, không có máy chủ thì cho chơi một mình
   if(!coMayChu) return null;
   try{
-    const r=await goi('/api/vao',{ten,g,cu:so.sid,ma:so.ma||'',hang:so.hang||0,den:so.prayers.filter(p=>p.chung).slice(0,5).map(p=>({t:p.text,ts:p.t}))});
+    const r=await goi('/api/vao',{ten,g,cu:so.sid,ma:so.ma||'',hang:so.hang||0,tt:so.ttCao||0,den:so.prayers.filter(p=>p.chung).slice(0,5).map(p=>({t:p.text,ts:p.t}))});
     if(r.status===404) return null;
     const j=await r.json(); if(!r.ok) return j.loi||'Chưa vào được, bạn thử lại nhé.';
     maPhien=j.id; so.sid=j.id; luu(); guiCu=''; $('#nut-chat').hidden=false;
