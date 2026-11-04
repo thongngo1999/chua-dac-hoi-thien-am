@@ -58,8 +58,11 @@ function vao(res, b) {
 function viTri(res, b) {
   const q = nguoi.get(b.id);
   if (!q) return json(res, 410, { loi: 'Phiên đã hết' });
-  q.x = so(b.x, -30, 45, q.x); q.z = so(b.z, -30, 45, q.z); q.r = so(b.r, -100, 100, q.r);
+  q.x = so(b.x, -30, 175, q.x); q.z = so(b.z, -50, 75, q.z); q.r = so(b.r, -100, 100, q.r);
   q.p = b.p === 'chap' || b.p === 'ngoi' ? b.p : 'dung'; doi = true;
+  // Trang phục và danh hiệu chỉ để hiển thị cho người khác
+  q.ao = /^[a-z]{1,12}$/.test(b.ao) ? b.ao : 'lam'; q.phu = /^[a-z,]{0,40}$/.test(b.phu) ? b.phu : '';
+  q.dh = typeof b.dh === 'string' ? b.dh.replace(/[\u0000-\u001f\u007f<>]/g, '').slice(0, 28) : '';
   json(res, 200, {});
 }
 function suKien(req, res, id) {
@@ -74,7 +77,7 @@ function suKien(req, res, id) {
   req.on('close', () => { if (q.res === res) { q.res = null; q.roi = Date.now(); doi = true; } });
 }
 const dangOnline = () => [...nguoi.values()].filter(q => q.res);
-const banTin = () => { capNhatNgay(); return JSON.stringify({ homNay: denHomNay.size, ds: dangOnline().map(({ id, n, g, x, z, r, p }) => ({ id, n, g, x, z, r, p, h: bang[chuanTen(n)]?.d || 0 })) }); };
+const banTin = () => { capNhatNgay(); return JSON.stringify({ homNay: denHomNay.size, ds: dangOnline().map(({ id, n, g, x, z, r, p, ao, phu, dh }) => ({ id, n, g, x, z, r, p, ao, phu, dh, h: bang[chuanTen(n)]?.d || 0 })) }); };
 
 /* ----- Bảng hạng: giữ điểm cao nhất của mỗi Pháp danh ----- */
 const bangXep = () => Object.values(bang).sort((a, b) => b.d - a.d);
